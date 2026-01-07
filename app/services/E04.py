@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Set
 from app.schemas.job import JobSchema
 from config import UNI_FILTER_PARAMS, MUL_FILTER_PARAMS, FIELD_NAMES_ORDER
 
@@ -30,7 +30,7 @@ class E04Spy():
 
         # 寫入空列表，清空舊紀錄
         with open(self.error_log_file, 'w', encoding='utf-8-sig') as f:
-            json.dump([], f)
+            json.dump("", f)
 
         self.refresh_session()
 
@@ -179,7 +179,7 @@ class E04Spy():
 
         return jobs[:max_num]
 
-    def get_job(self, job_id: str) -> Optional[Dict[str, Any]]:
+    def get_job(self, job_id: str) -> Optional[JobSchema]:
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
         headers = {'Referer': f'https://www.104.com.tw/job/{job_id}', 
                    'Accept': 'application/json'}
@@ -213,30 +213,31 @@ class E04Spy():
             work_shift = ' '.join(workPeriod.get('shifts', {}).keys())
             duty_time = workPeriod.get('note', '')
             
-            data_info = {
-                '更新日期': header.get('appearDate'),
-                '工作型態': workType,  
-                '工作時段': f"{work_shift} {duty_time}".strip() or '無',
-                '薪資類型': salary_map.get(job_detail.get('salaryType'), '其他'),
-                '最低薪資': int(job_detail.get('salaryMin', 0)),
-                '最高薪資': int(job_detail.get('salaryMax', 0)),
-                '職缺名稱': header.get('jobName'),
-                '學歷': condition.get('edu'),
-                '工作經驗': condition.get('workExp'),
-                '工作縣市': job_detail.get('addressArea'),
-                '工作里區': jobArea,
-                '工作地址': job_detail.get('addressDetail') or '無',
-                '公司名稱': header.get('custName'),
-                '職缺描述': job_detail.get('jobDescription') or '無',
-                '其他描述': condition.get('other') or '無',
-                '擅長要求': ', '.join(item.get('description', '') for item in condition.get('specialty', [])) or '無',
-                '證照': ', '.join(item.get('name', '') for item in condition.get('certificate', [])) or '無',
-                '駕駛執照': ', '.join(condition.get('driverLicense', [])) or '無',
-                '出差': job_detail.get('businessTrip') or '無',
-                '104 職缺網址': f'https://www.104.com.tw/job/{job_id}?apply=form',
-                '公司產業類別': job_data.get('industry'),
-                '法定福利': ', '.join(welfare.get('legalTag', [])) or '無',
-            }
+            data_info = JobSchema(
+                    id = job_id,
+                    posted_date = header.get('appearDate'), 
+                    work_type = workType,
+                    work_shift = f"{work_shift} {duty_time}".strip() or '無',
+                    salary_type = salary_map.get(job_detail.get('salaryType'), '其他'),
+                    salary_min = int(job_detail.get('salaryMin', 0)),
+                    salary_max = int(job_detail.get('salaryMax', 0)),
+                    job_name = header.get('jobName'),
+                    education = condition.get('edu'),
+                    experience = condition.get('workExp'),
+                    addressArea = job_detail.get('addressArea'),
+                    job_area = jobArea,
+                    address_detail = job_detail.get('addressDetail') or '無',
+                    company_name = header.get('custName'),
+                    job_description = job_detail.get('jobDescription') or '無',
+                    other_description = condition.get('other') or '無',
+                    specialt = ', '.join(item.get('description', '') for item in condition.get('specialty', [])) or '無',
+                    certificate = ', '.join(item.get('name', '') for item in condition.get('certificate', [])) or '無',
+                    driver_license = ', '.join(condition.get('driverLicense', [])) or '無',
+                    business_trip = job_detail.get('businessTrip') or '無',
+                    job_url = f'https://www.104.com.tw/job/{job_id}?apply=form',
+                    industry = job_data.get('industry'),
+                    legal_welfare = ', '.join(welfare.get('legalTag', [])) or '無',
+            )
             
             return data_info
         
