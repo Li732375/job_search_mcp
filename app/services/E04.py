@@ -17,11 +17,11 @@ from playwright_stealth import Stealth
 sys.stdout.reconfigure(encoding='utf-8-sig')
 
 
-class E04Spy():
+class SpyE04():
     def __init__(self):
-        self.session = requests.Session()
-        self.headers_user_agent: str = ""
-        self.error_log_file: str = 'error_message.json'
+        self._session = requests.Session()
+        self._headers_user_agent: str = ""
+        self._error_log_file: str = 'error_message.json'
 
         self._uni_filter_params: Dict[str, str] = UNI_FILTER_PARAMS
         self._mul_filter_params: Dict[str, str] = MUL_FILTER_PARAMS
@@ -29,7 +29,7 @@ class E04Spy():
 
 
         # 寫入空列表，清空舊紀錄
-        with open(self.error_log_file, 'w', encoding='utf-8-sig') as f:
+        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
             json.dump("", f)
 
         self.refresh_session()
@@ -78,15 +78,15 @@ class E04Spy():
         
         # 讀取現有紀錄並更新
         data = []
-        if os.path.exists(self.error_log_file):
+        if os.path.exists(self._error_log_file):
             try:
-                with open(self.error_log_file, 'r', encoding='utf-8-sig') as f:
+                with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
                     data = json.load(f)
             except:
                 data = []
         
         data.append(error_entry)
-        with open(self.error_log_file, 'w', encoding='utf-8-sig') as f:
+        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
     def refresh_session(self) -> None:
@@ -106,10 +106,10 @@ class E04Spy():
                           )
                 # 短暫隨機等待(JavaScript 初始化完成，cookie/session 可用以及模擬真人停留時間)
                 time.sleep(random.uniform(0.5, 3))
-                self.headers_user_agent = page.evaluate("navigator.userAgent")
+                self._headers_user_agent = page.evaluate("navigator.userAgent")
                 cookies = context.cookies()
                 for cookie in cookies:
-                    self.session.cookies.set(cookie['name'], cookie['value'], 
+                    self._session.cookies.set(cookie['name'], cookie['value'], 
                                              domain=cookie['domain'])
                 print("已更新憑證")
             except Exception as e:
@@ -124,12 +124,12 @@ class E04Spy():
                          ) -> Optional[requests.Response]:
         attempt = 0
         if headers is None: headers = {}
-        headers['User-Agent'] = self.headers_user_agent
+        headers['User-Agent'] = self._headers_user_agent
         headers['Referer'] = 'https://www.104.com.tw/'
 
         while attempt < max_retries:
             try:
-                r = self.session.get(url, headers=headers, params=params, 
+                r = self._session.get(url, headers=headers, params=params, 
                                      timeout=15)
                 if r.status_code == 200: return r
 
@@ -282,7 +282,7 @@ class E04Spy():
             for idx, job_id in enumerate(job_ids, 1):
                 info = self.get_job(job_id)
                 if info:
-                    writer.writerow({k: info.get(k, '無') for k in self._field_names_order})
+                    writer.writerow(info.model_dump())
                     f.flush()
                 print(f"進度：{(idx/len(job_ids))*100:6.2f} % ({idx}/{len(job_ids)})", end='\r')
                 time.sleep(random.uniform(0.1, 1))
