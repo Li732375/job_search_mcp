@@ -1,0 +1,233 @@
+﻿[
+    {
+        "timestamp": "2026-01-07 14:21:36",
+        "job_id": "7yxpa",
+        "error_message": "'list' object has no attribute 'get'",
+        "raw_data": {
+            "corpImageRight": {
+                "corpImageRight": {
+                    "imageUrl": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/custintroduce/image3.jpg?v=20251212135752",
+                    "link": "https://www.facebook.com/CHELIC-%E5%8F%B0%E7%81%A3%E6%B0%A3%E7%AB%8B-266945474252463/"
+                }
+            },
+            "header": {
+                "corpImageTop": {
+                    "imageUrl": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/custintroduce/image2.jpg?v=20251212135752",
+                    "link": ""
+                },
+                "jobName": "韌體設計工程師(MCU)",
+                "appearDate": "2026/01/02",
+                "custName": "台灣氣立股份有限公司",
+                "custUrl": "https://www.104.com.tw/company/a8tjn2o",
+                "analysisType": 1,
+                "analysisUrl": "//www.104.com.tw/jobs/apply/analysis/7yxpa",
+                "isSaved": false,
+                "isFollowed": false,
+                "isApplied": false,
+                "applyDate": "",
+                "userApplyCount": 0,
+                "hrBehaviorPR": 0.8391990168510913
+            },
+            "contact": {
+                "hrName": "人資潘小姐",
+                "email": "chelic-hrm@chelic.com",
+                "visit": "",
+                "phone": [],
+                "other": "",
+                "reply": ""
+            },
+            "environmentPic": {
+                "environmentPic": [
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_890328564411361691.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_890328564411361691.jpg?v=20251212135752",
+                        "description": "台北公司總部"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_890328564411361829.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_890328564411361829.jpg?v=20251212135752",
+                        "description": "上海氣立可分公司"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_893506157127402165.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_893506157127402165.jpg?v=20251212135752",
+                        "description": "深圳氣立可分公司"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_965576701510265232.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_965576701510265232.jpg?v=20251212135752",
+                        "description": "氣立可科技(泰國)分公司"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_962627717424900000.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_962627717424900000.jpg?v=20251212135752",
+                        "description": "員工旅遊"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_890328564411367250.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_890328564411367250.jpg?v=20251212135752",
+                        "description": "健康檢查"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_962627717424902413.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_962627717424902413.jpg?v=20251212135752",
+                        "description": "退休員工歡送會"
+                    },
+                    {
+                        "thumbnailLink": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/s_962627717424902295.jpg?v=20251212135752",
+                        "link": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/env/l_962627717424902295.jpg?v=20251212135752",
+                        "description": "教育訓練"
+                    }
+                ],
+                "corpImageBottom": {
+                    "imageUrl": "",
+                    "link": ""
+                }
+            },
+            "condition": {
+                "acceptRole": {
+                    "role": [],
+                    "disRole": {
+                        "needHandicapCompendium": false,
+                        "disability": []
+                    }
+                },
+                "workExp": "5年以上",
+                "edu": "碩士以上",
+                "major": [
+                    "電機電子工程相關",
+                    "工業設計相關",
+                    "工業工程相關"
+                ],
+                "language": [
+                    {
+                        "code": 1,
+                        "language": "英文",
+                        "ability": {
+                            "listening": "略懂",
+                            "speaking": "略懂",
+                            "reading": "略懂",
+                            "writing": "略懂"
+                        }
+                    }
+                ],
+                "localLanguage": [
+                    {
+                        "code": 1,
+                        "language": "台語",
+                        "ability": "中等"
+                    }
+                ],
+                "specialty": [],
+                "skill": [
+                    {
+                        "code": "11010006012",
+                        "description": "撰寫硬體語言程式"
+                    },
+                    {
+                        "code": "11010006007",
+                        "description": "硬體工程技術開發"
+                    },
+                    {
+                        "code": "11010006008",
+                        "description": "硬體系統研發設計"
+                    }
+                ],
+                "certificate": [
+                    {
+                        "name": "ITE-ES-嵌入式系統技術",
+                        "code": 4002036058
+                    },
+                    {
+                        "name": "ITE-ES-嵌入式系統的開發平台與工具",
+                        "code": 4002036059
+                    }
+                ],
+                "driverLicense": [],
+                "other": "◎團隊合作：具備良好的團隊合作精神，能夠與軟體、硬體工程師及產品經理協作。\n◎學習熱忱：持續學習新技術，保持對新知識的熱忱。\n◎溝通能力：良好的溝通技巧，能夠有效地與不同部門協調。\n\n※有相關的專業證照，如嵌入式系統開發證書尤佳。"
+            },
+            "welfare": {
+                "tag": [
+                    "員工認股",
+                    "年終獎金",
+                    "專業證照獎金",
+                    "結婚禮金",
+                    "生育津貼",
+                    "住院慰問金",
+                    "國內旅遊",
+                    "員工停車位"
+                ],
+                "welfare": "【氣立人才專屬｜除了薪資，我們更在乎你的生活與未來】\n\n★ 讓荷包更充實（財富共享）\n【利潤共享】：具競爭力的年終獎金、績效獎金、專案獎金，付出被看見！\n【長期理財】：員工持股信託（公司幫你存錢），共享企業成長果實。\n【各類津貼】：三節獎金、生日禮金、專業證照獎金，大小節日都照顧。\n\n★ 讓上班更舒適（貼心福利）\n【通勤無憂】：提供員工專屬停車位、員工制服。\n【食在滿足】：餐費補助，照顧你的胃。\n【家庭後盾】：優惠托育服務、育嬰減少工時、婚喪/生育/住院補助，兼顧家庭更安心。\n\n★ 讓職涯更增值（人才發展）\n【教育訓練補助】：支持外部技術研討與技能訓練，學費公司出！\n【產學交流】：與學校深度合作，接觸前瞻技術。\n\n★ 讓身心有保障（健康守護）\n免費年度高規格健檢、免費團體保險、公傷慰問金（勞健勞退為基本標配）。",
+                "legalTag": [
+                    "哺乳室",
+                    "週休二日",
+                    "家庭照顧假",
+                    "勞保",
+                    "健保",
+                    "特別休假",
+                    "育嬰留停",
+                    "女性生理假",
+                    "勞退提撥金",
+                    "員工體檢",
+                    "職災保險"
+                ]
+            },
+            "jobDetail": {
+                "jobDescription": "我們正在尋找一位 對 MCU 韌體開發充滿熱情的你！\n如果你喜歡鑽研底層、熱愛解決問題、看到產品從 0 → 1 上線的成就感，那這份工作會讓你每天都超有動力！\n\n【工作內容｜你將負責的挑戰】\n✦ MCU 韌體開發：使用 PIC16/24、ARM Cortex-M 進行程式開發與 Debug。\n✦ 底層驅動開發：I2C / I2S / SPI / UART / USB 等介面開發經驗佳。\n✦ 感測資料處理：具有 ADC 量測、訊號處理概念尤佳。\n✦ 跨部門協作：協助電控部門規劃、支援其他部門電控產品開發。\n✦ 產品導入流程：參與設計、試作、測試到量產。\n\n【加分亮點】\n✔ 電機、電子、資工等相關科系。\n✔ 熟悉 C 語言、嵌入式系統開發。\n✔ 有韌體開發、驅動程式、週邊介面經驗。\n✔ 具嵌入式系統相關證照者優先。\n\n【我們想找的你】\n◎  喜歡學習新技術、熱愛研究每一行程式碼的運作原理。\n◎  具備 良好溝通與團隊合作能力，能與軟硬體團隊緊密合作。\n◎  遇到 Bug 不放棄、遇到困難會想辦法解。\n\n【為什麼加入我們？】\n●  能接觸 多種 MCU、感測器、通訊介面，技術成長超快。\n●  產品從研發→量產全流程參與，成就感滿滿。\n●  團隊氛圍佳，問題有人討論、技能有人帶。",
+                "jobCategory": [
+                    {
+                        "code": "9006001000",
+                        "description": "硬體工程研發高階主管"
+                    },
+                    {
+                        "code": "9006002000",
+                        "description": "軟體工程研發高階主管"
+                    },
+                    {
+                        "code": "9006005000",
+                        "description": "其他工程研發高階主管"
+                    }
+                ],
+                "salary": "待遇面議",
+                "salaryMin": 0,
+                "salaryMax": 0,
+                "salaryType": 10,
+                "jobType": 3,
+                "workType": [],
+                "addressNo": "6001002022",
+                "addressRegion": "新北市泰山區",
+                "addressArea": "新北市",
+                "addressDetail": "貴鳳街21號(近捷運新莊線丹鳳站及機場捷運泰山貴和站)",
+                "industryArea": "",
+                "longitude": "121.422233",
+                "latitude": "25.031094",
+                "manageResp": "不需負擔管理責任",
+                "businessTrip": "無需出差外派",
+                "workPeriod": [],
+                "workPeriodTags": [],
+                "vacationPolicy": "",
+                "startWorkingDay": "不限",
+                "hireType": 0,
+                "delegatedRecruit": "",
+                "needEmp": "1人",
+                "landmark": "距捷運丹鳳站約250公尺",
+                "remoteWork": null
+            },
+            "switch": "on",
+            "custLogo": "https://static.104.com.tw/b_profile/cust_picture/8000/22301178000/logo.jpg?v=20251212135752",
+            "postalCode": "243",
+            "closeDate": "",
+            "industry": "自動控制相關業",
+            "custNo": "22301178000",
+            "reportUrl": "https://www.104.com.tw/feedback?category=2&custName=%E5%8F%B0%E7%81%A3%E6%B0%A3%E7%AB%8B%E8%82%A1%E4%BB%BD%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8&jobName=%E9%9F%8C%E9%AB%94%E8%A8%AD%E8%A8%88%E5%B7%A5%E7%A8%8B%E5%B8%AB%28MCU%29",
+            "industryNo": "1002012001",
+            "employees": "235人",
+            "chinaCorp": false,
+            "interactionRecord": {
+                "lastProcessedResumeAtTime": 1767753797,
+                "lastCustReplyTimestamp": 1767753779,
+                "nowTimestamp": 1767766896
+            }
+        }
+    }
+]
