@@ -6,7 +6,7 @@ from datetime import datetime
 
 # 定義每筆職缺資料的結構
 class JobSchema(BaseModel):
-    id: str = Field(description = "職缺 ID")
+    #id: str = Field(description = "職缺 ID")
     posted_date: datetime = Field(description = "更新日期")
     work_type: str = Field(description = "工作型態")
     work_shift: str = Field(description = "工作時段")
