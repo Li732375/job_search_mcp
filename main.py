@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from app.services.E04 import E04Spy
+from app.services.E04 import SpyE04
 from app.services.job_crawl_flow import crawl_all_jobs
 
 
 def main():
-    spider = E04Spy()
+    spider = SpyE04()
     jobs = crawl_all_jobs(spider)
 
     print(f"共取得 {len(jobs)} 筆職缺")

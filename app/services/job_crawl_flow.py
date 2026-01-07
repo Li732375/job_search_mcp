@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from typing import List
 from app.schemas.job import JobSchema
-from app.services.E04 import E04Spy
+from app.services.E04 import SpyE04
 
 import time
 import json
 
 
-def crawl_all_jobs(spider: E04Spy) -> List[JobSchema]:    
-    spider = E04Spy()
+def crawl_all_jobs(spider: SpyE04) -> List[JobSchema]:    
+    spider = SpyE04()
 
     # 取得篩選條件
     uni_params = spider.uni_filter_params
