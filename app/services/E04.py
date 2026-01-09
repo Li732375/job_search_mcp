@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple, Any, Set
 from app.schemas.job import JobSchema
-from config import UNI_FILTER_PARAMS, MUL_FILTER_PARAMS, FIELD_NAMES_ORDER
+from config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER
 
 import time
 import random
@@ -8,23 +8,20 @@ import requests
 from itertools import product
 import csv
 import json
-import sys
 import os
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
 
-# 設定標準輸出編碼
-sys.stdout.reconfigure(encoding='utf-8-sig')
-
 
 class SpyE04():
     def __init__(self):
+        """初始化 SpyE04 爬蟲類別"""
         self._session = requests.Session()
         self._headers_user_agent: str = ""
         self._error_log_file: str = 'error_message.json'
 
-        self._uni_filter_params: Dict[str, str] = UNI_FILTER_PARAMS
-        self._mul_filter_params: Dict[str, str] = MUL_FILTER_PARAMS
+        self._uni_filter_params: Dict[str, str] = E04_UNI_FILTER_PARAMS
+        self._mul_filter_params: Dict[str, str] = E04_MUL_FILTER_PARAMS
         self._field_names_order: List[str] = FIELD_NAMES_ORDER
 
 
@@ -35,61 +32,19 @@ class SpyE04():
         self.refresh_session()
 
     @property
-    def uni_filter_params(self) -> Dict[str, str]:
-        return self._uni_filter_params
-    
-    @uni_filter_params.setter
-    def uni_filter_params(self, value: Dict[str, str]) -> None:
-        if not isinstance(value, dict):
-            raise TypeError("uni_filter_params 必須是 dict")
-        self._uni_filter_params = value
-    
-    @property
-    def mul_filter_params(self) -> Dict[str, str]:
-        return self._mul_filter_params
-    
-    @mul_filter_params.setter
-    def mul_filter_params(self, value: Dict[str, str]) -> None:
-        if not isinstance(value, dict):
-            raise TypeError("mul_filter_params 必須是 dict")
-        self._mul_filter_params = value
-
-    @property
     def field_names_order(self) -> Dict[str]:
+        """取得 CSV 欄位名稱順序"""
         return self._field_names_order
     
     @field_names_order.setter
     def field_names_order(self, value: Dict[str]) -> None:
+        """設定 CSV 欄位名稱順序"""
         if not isinstance(value, dict):
             raise TypeError("field_names_order 必須是 dict")
         self._field_names_order = value
 
-    def log_error(self, 
-                  job_id: str, 
-                  message: Any, 
-                  raw_data: Optional[Any]=None) -> None:
-        """將錯誤訊息與原始資料存入 JSON 檔案"""
-        error_entry = {
-            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
-            'job_id': job_id,
-            'error_message': str(message),
-            'raw_data': raw_data
-        }
-        
-        # 讀取現有紀錄並更新
-        data = []
-        if os.path.exists(self._error_log_file):
-            try:
-                with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
-                    data = json.load(f)
-            except:
-                data = []
-        
-        data.append(error_entry)
-        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-
     def refresh_session(self) -> None:
+        """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
         print("正在啟動隱身瀏覽器通過驗證...", end='', flush=True)
         with Stealth().use_sync(sync_playwright()) as p:
             browser = p.chromium.launch(headless=True)
@@ -117,37 +72,64 @@ class SpyE04():
             finally:
                 browser.close()
 
-    def fetch_with_retry(self, url: str, 
-                         headers: Optional[Dict[str, str]]=None, 
-                         params: Optional[Any]=None, 
-                         max_retries: int = 3
-                         ) -> Optional[requests.Response]:
-        attempt = 0
-        if headers is None: headers = {}
-        headers['User-Agent'] = self._headers_user_agent
-        headers['Referer'] = 'https://www.104.com.tw/'
-
-        while attempt < max_retries:
+    def log_error(self, 
+                  job_id: str, 
+                  message: Any, 
+                  raw_data: Optional[Any]=None) -> None:
+        """將錯誤訊息與原始資料存入 JSON 檔案"""
+        error_entry = {
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'job_id': job_id,
+            'error_message': str(message),
+            'raw_data': raw_data
+        }
+        
+        # 讀取現有紀錄並更新
+        data = []
+        if os.path.exists(self._error_log_file):
             try:
-                r = self._session.get(url, headers=headers, params=params, 
-                                     timeout=15)
-                if r.status_code == 200: return r
+                with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
+                    data = json.load(f)
+            except:
+                data = []
+        
+        data.append(error_entry)
+        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
-                if r.status_code in (429, 403):
-                    self.refresh_session()
-                    time.sleep(random.uniform(5, 10))
-                    attempt += 1
-                    continue
-                return None
-            
-            except Exception as e:
-                attempt += 1
-                time.sleep(2)
-        return None
+    def generate_filter_combinations(self, 
+                                     mul_filter_params: Dict[str, str]
+                                     ) -> Tuple[List[str], List[Tuple[str, ...]]]:
+        """產生獨立與複合篩選條件的所有組合"""
+        keys: List[str] = list(mul_filter_params.keys())
+        values: List[List[str]] = [v.split(',') for v in mul_filter_params.values()]
+        combinations: List[Tuple[str, ...]] = list(product(*values))
+        return keys, combinations
+   
+    def collect_job_ids(self, 
+                        uni_filter_params: Dict[str, str], 
+                        keys: List[str], 
+                        combinations: List[Tuple[str, ...]]
+                        , max_num: int = 20
+                        ) -> Set[str]:
+        """依據篩選條件組合蒐集職缺 ID"""
+        alljobs_set: Set[str] = set()
+
+        for idx, combo in enumerate(combinations, 1):
+            filter_params: Dict[str, str] = {
+                **uni_filter_params,
+                **dict(zip(keys, combo))
+            }
+            jobs: List[str] = self.search(max_num=max_num, filter_params=filter_params)
+            alljobs_set.update(jobs)
+            print(f"進度：{(idx/len(combinations))*100:6.2f} % | 累計職缺：{len(alljobs_set)}", end='\r')
+
+        return alljobs_set
 
     def search(self, 
                max_num: int =150, 
-               filter_params: Optional[Dict[str, str]]=None) -> List[str]: 
+               filter_params: Optional[Dict[str, str]]=None) -> List[str]:
+        """依據組合的篩選條件，逐一搜刮該條件每頁職缺 ID"""
         jobs = []
         query_parts = ['jobsource=index_s', 'mode=s']
 
@@ -179,7 +161,37 @@ class SpyE04():
 
         return jobs[:max_num]
 
+    def fetch_with_retry(self, url: str, 
+                         headers: Optional[Dict[str, str]]=None, 
+                         params: Optional[Any]=None, 
+                         max_retries: int = 3
+                         ) -> Optional[requests.Response]:
+        """帶重試機制的 GET 請求"""
+        attempt = 0
+        if headers is None: headers = {}
+        headers['User-Agent'] = self._headers_user_agent
+        headers['Referer'] = 'https://www.104.com.tw/'
+
+        while attempt < max_retries:
+            try:
+                r = self._session.get(url, headers=headers, params=params, 
+                                     timeout=15)
+                if r.status_code == 200: return r
+
+                if r.status_code in (429, 403):
+                    self.refresh_session()
+                    time.sleep(random.uniform(5, 10))
+                    attempt += 1
+                    continue
+                return None
+            
+            except Exception as e:
+                attempt += 1
+                time.sleep(2)
+        return None
+
     def get_job(self, job_id: str) -> Optional[JobSchema]:
+        """取得單筆職缺詳情"""
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
         headers = {'Referer': f'https://www.104.com.tw/job/{job_id}', 
                    'Accept': 'application/json'}
@@ -244,37 +256,11 @@ class SpyE04():
         except Exception as e:
             self.log_error(job_id, e, raw_data=job_data)
             return None
-
-    def generate_filter_combinations(self, 
-                                     mul_filter_params: Dict[str, str]
-                                     ) -> Tuple[List[str], List[Tuple[str, ...]]]:
-        keys: List[str] = list(mul_filter_params.keys())
-        values: List[List[str]] = [v.split(',') for v in mul_filter_params.values()]
-        combinations: List[Tuple[str, ...]] = list(product(*values))
-        return keys, combinations
-    
-    def collect_job_ids(self, 
-                        uni_filter_params: Dict[str, str], 
-                        keys: List[str], 
-                        combinations: List[Tuple[str, ...]]
-                        , max_num: int = 20
-                        ) -> Set[str]:
-        alljobs_set: Set[str] = set()
-
-        for idx, combo in enumerate(combinations, 1):
-            filter_params: Dict[str, str] = {
-                **uni_filter_params,
-                **dict(zip(keys, combo))
-            }
-            jobs: List[str] = self.search(max_num=max_num, filter_params=filter_params)
-            alljobs_set.update(jobs)
-            print(f"進度：{(idx/len(combinations))*100:6.2f} % | 累計職缺：{len(alljobs_set)}", end='\r')
-
-        return alljobs_set
     
     def fetch_jobs_and_write_csv(self, 
                                  job_ids: Set[str], 
                                  output_file: str) -> None:
+        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
         with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self._field_names_order)
             writer.writeheader()
