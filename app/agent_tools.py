@@ -16,3 +16,6 @@ def crawl_e04_jobs() -> None:
     
     spider = SpyE04()
     crawl_E04_jobs(spider)
+
+if __name__ == "__main__":
+    app.run()
