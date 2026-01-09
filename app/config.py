@@ -1,5 +1,5 @@
 # 獨立篩選條件
-UNI_FILTER_PARAMS = { 
+E04_UNI_FILTER_PARAMS = { 
     's5': '0',
     'isnew': '3',
     'wktm': '1',
@@ -7,7 +7,7 @@ UNI_FILTER_PARAMS = {
 }
 
 # 複合篩選條件
-MUL_FILTER_PARAMS = {
+E04_MUL_FILTER_PARAMS = {
     'area': '6001001000,6001016000,6001002011',
     'jobexp': '1,3',
     'edu': '3,4,5',
