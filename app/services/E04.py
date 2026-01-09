@@ -129,7 +129,7 @@ class SpyE04():
     def search(self, 
                max_num: int =150, 
                filter_params: Optional[Dict[str, str]]=None) -> List[str]:
-        """依據組合的篩選條件，逐一搜刮該條件每頁職缺 ID"""
+        """逐一搜刮該篩選條件下每頁職缺 ID"""
         jobs = []
         query_parts = ['jobsource=index_s', 'mode=s']
 
@@ -189,6 +189,22 @@ class SpyE04():
                 attempt += 1
                 time.sleep(2)
         return None
+
+    def fetch_jobs_and_write_csv(self, 
+                                 job_ids: Set[str], 
+                                 output_file: str) -> None:
+        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
+        with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=self._field_names_order)
+            writer.writeheader()
+
+            for idx, job_id in enumerate(job_ids, 1):
+                info = self.get_job(job_id)
+                if info:
+                    writer.writerow(info.model_dump())
+                    f.flush()
+                print(f"進度：{(idx/len(job_ids))*100:6.2f} % ({idx}/{len(job_ids)})", end='\r')
+                time.sleep(random.uniform(0.1, 1))
 
     def get_job(self, job_id: str) -> Optional[JobSchema]:
         """取得單筆職缺詳情"""
@@ -257,18 +273,3 @@ class SpyE04():
             self.log_error(job_id, e, raw_data=job_data)
             return None
     
-    def fetch_jobs_and_write_csv(self, 
-                                 job_ids: Set[str], 
-                                 output_file: str) -> None:
-        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
-        with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=self._field_names_order)
-            writer.writeheader()
-
-            for idx, job_id in enumerate(job_ids, 1):
-                info = self.get_job(job_id)
-                if info:
-                    writer.writerow(info.model_dump())
-                    f.flush()
-                print(f"進度：{(idx/len(job_ids))*100:6.2f} % ({idx}/{len(job_ids)})", end='\r')
-                time.sleep(random.uniform(0.1, 1))
