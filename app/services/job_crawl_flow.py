@@ -7,7 +7,7 @@ import time
 import json
 
 
-def crawl_all_jobs(spider: SpyE04) -> List[JobSchema]:    
+def crawl_E04_jobs(spider: SpyE04) -> List[JobSchema]:    
     spider = SpyE04()
 
     # 取得篩選條件
@@ -20,9 +20,9 @@ def crawl_all_jobs(spider: SpyE04) -> List[JobSchema]:
 
     # 搜尋職缺 ID
     job_ids = spider.collect_job_ids(
-        uni_filter_params=uni_params,
-        keys=keys,
-        combinations=combinations,
+        uni_filter_param = uni_params,
+        keys = keys,
+        combinations = combinations,
     )
     print(f"共取得 {len(job_ids)} 筆職缺")
 
