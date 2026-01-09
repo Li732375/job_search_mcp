@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from dev.app.services.spyE04 import SpyE04
+from .spyE04 import SpyE04
 
 import time
 import json
@@ -10,17 +10,12 @@ def crawl_E04_jobs(spider: SpyE04) -> None:
     
     spider = SpyE04()
 
-    # 取得篩選條件
-    uni_params = spider.uni_filter_params
-    mul_params = spider.mul_filter_params
-
     # 產生組合
-    keys, combinations = spider.generate_filter_combinations(mul_params)
+    keys, combinations = spider.generate_filter_combinations()
     print(f"開始搜尋職缺 ID（組合數：{len(combinations)}）")
 
     # 搜尋職缺 ID
     job_ids = spider.collect_job_ids(
-        uni_filter_param = uni_params,
         keys = keys,
         combinations = combinations,
     )
