@@ -90,20 +90,18 @@ class SpyE04():
             json.dump(data, f, ensure_ascii=False, indent=4)
 
     def generate_filter_combinations(self, 
-                                     mul_filter_params: Dict[str, str]
                                      ) -> Tuple[List[str], List[Tuple[str, ...]]]:
         """產生獨立與複合篩選條件的所有組合"""
 
-        keys: List[str] = list(mul_filter_params.keys())
-        values: List[List[str]] = [v.split(',') for v in mul_filter_params.values()]
+        keys: List[str] = list(self._mul_filter_params.keys())
+        values: List[List[str]] = [v.split(',') for v in self._mul_filter_params.values()]
         combinations: List[Tuple[str, ...]] = list(product(*values))
         return keys, combinations
    
-    def collect_job_ids(self, 
-                        uni_filter_params: Dict[str, str], 
+    def collect_job_ids(self,  
                         keys: List[str], 
-                        combinations: List[Tuple[str, ...]]
-                        , max_num: int = 20
+                        combinations: List[Tuple[str, ...]], 
+                        max_num: int = 20
                         ) -> Set[str]:
         """依據篩選條件組合蒐集職缺 ID"""
 
@@ -111,10 +109,11 @@ class SpyE04():
 
         for idx, combo in enumerate(combinations, 1):
             filter_params: Dict[str, str] = {
-                **uni_filter_params,
+                **self._uni_filter_params,
                 **dict(zip(keys, combo))
             }
             jobs: List[str] = self.search(max_num=max_num, filter_params=filter_params)
+
             alljobs_set.update(jobs)
             print(f"進度：{(idx/len(combinations))*100:6.2f} % | 累計職缺：{len(alljobs_set)}", end='\r')
 
@@ -192,18 +191,14 @@ class SpyE04():
         """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
 
         with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
-            headers = [JOB_FIELD_MAPPING[k] for k in FIELD_NAMES_ORDER]
-            writer = csv.DictWriter(f, fieldnames=headers)
+            writer = csv.DictWriter(f, fieldnames=FIELD_NAMES_ORDER)
             writer.writeheader()
 
             for idx, job_id in enumerate(job_ids, 1):
                 info = self.get_job(job_id)
                 if info:
                     raw = info.model_dump()
-                    row = {
-                        JOB_FIELD_MAPPING[k]: raw.get(k)
-                        for k in JOB_FIELD_MAPPING.keys()
-                    }
+                    row = {col: raw.get(JOB_FIELD_MAPPING[col]) for col in FIELD_NAMES_ORDER}
 
                     writer.writerow(row)
                     f.flush()
