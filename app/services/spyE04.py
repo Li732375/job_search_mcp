@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional, Tuple, Any, Set
-from app.schemas.job import JobSchema
-from config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER
+from app.schemas.job_schema import JobSchema
+from config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER, JOB_FIELD_MAPPING
+
 
 import time
 import random
@@ -16,6 +17,7 @@ from playwright_stealth import Stealth
 class SpyE04():
     def __init__(self):
         """初始化 SpyE04 爬蟲類別"""
+
         self._session = requests.Session()
         self._headers_user_agent: str = ""
         self._error_log_file: str = 'error_message.json'
@@ -31,20 +33,9 @@ class SpyE04():
 
         self.refresh_session()
 
-    @property
-    def field_names_order(self) -> Dict[str]:
-        """取得 CSV 欄位名稱順序"""
-        return self._field_names_order
-    
-    @field_names_order.setter
-    def field_names_order(self, value: Dict[str]) -> None:
-        """設定 CSV 欄位名稱順序"""
-        if not isinstance(value, dict):
-            raise TypeError("field_names_order 必須是 dict")
-        self._field_names_order = value
-
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
+
         print("正在啟動隱身瀏覽器通過驗證...", end='', flush=True)
         with Stealth().use_sync(sync_playwright()) as p:
             browser = p.chromium.launch(headless=True)
@@ -77,6 +68,7 @@ class SpyE04():
                   message: Any, 
                   raw_data: Optional[Any]=None) -> None:
         """將錯誤訊息與原始資料存入 JSON 檔案"""
+
         error_entry = {
             'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
             'job_id': job_id,
@@ -101,6 +93,7 @@ class SpyE04():
                                      mul_filter_params: Dict[str, str]
                                      ) -> Tuple[List[str], List[Tuple[str, ...]]]:
         """產生獨立與複合篩選條件的所有組合"""
+
         keys: List[str] = list(mul_filter_params.keys())
         values: List[List[str]] = [v.split(',') for v in mul_filter_params.values()]
         combinations: List[Tuple[str, ...]] = list(product(*values))
@@ -113,6 +106,7 @@ class SpyE04():
                         , max_num: int = 20
                         ) -> Set[str]:
         """依據篩選條件組合蒐集職缺 ID"""
+
         alljobs_set: Set[str] = set()
 
         for idx, combo in enumerate(combinations, 1):
@@ -130,6 +124,7 @@ class SpyE04():
                max_num: int =150, 
                filter_params: Optional[Dict[str, str]]=None) -> List[str]:
         """逐一搜刮該篩選條件下每頁職缺 ID"""
+
         jobs = []
         query_parts = ['jobsource=index_s', 'mode=s']
 
@@ -167,6 +162,7 @@ class SpyE04():
                          max_retries: int = 3
                          ) -> Optional[requests.Response]:
         """帶重試機制的 GET 請求"""
+
         attempt = 0
         if headers is None: headers = {}
         headers['User-Agent'] = self._headers_user_agent
@@ -194,20 +190,29 @@ class SpyE04():
                                  job_ids: Set[str], 
                                  output_file: str) -> None:
         """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
+
         with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=self._field_names_order)
+            headers = [JOB_FIELD_MAPPING[k] for k in FIELD_NAMES_ORDER]
+            writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
 
             for idx, job_id in enumerate(job_ids, 1):
                 info = self.get_job(job_id)
                 if info:
-                    writer.writerow(info.model_dump())
+                    raw = info.model_dump()
+                    row = {
+                        JOB_FIELD_MAPPING[k]: raw.get(k)
+                        for k in JOB_FIELD_MAPPING.keys()
+                    }
+
+                    writer.writerow(row)
                     f.flush()
                 print(f"進度：{(idx/len(job_ids))*100:6.2f} % ({idx}/{len(job_ids)})", end='\r')
                 time.sleep(random.uniform(0.1, 1))
 
     def get_job(self, job_id: str) -> Optional[JobSchema]:
         """取得單筆職缺詳情"""
+
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
         headers = {'Referer': f'https://www.104.com.tw/job/{job_id}', 
                    'Accept': 'application/json'}
@@ -242,7 +247,6 @@ class SpyE04():
             duty_time = workPeriod.get('note', '')
             
             data_info = JobSchema(
-                    id = job_id,
                     posted_date = header.get('appearDate'), 
                     work_type = workType,
                     work_shift = f"{work_shift} {duty_time}".strip() or '無',
@@ -252,13 +256,13 @@ class SpyE04():
                     job_name = header.get('jobName'),
                     education = condition.get('edu'),
                     experience = condition.get('workExp'),
-                    addressArea = job_detail.get('addressArea'),
+                    address_area = job_detail.get('addressArea'),
                     job_area = jobArea,
                     address_detail = job_detail.get('addressDetail') or '無',
                     company_name = header.get('custName'),
                     job_description = job_detail.get('jobDescription') or '無',
                     other_description = condition.get('other') or '無',
-                    specialt = ', '.join(item.get('description', '') for item in condition.get('specialty', [])) or '無',
+                    specialty = ', '.join(item.get('description', '') for item in condition.get('specialty', [])) or '無',
                     certificate = ', '.join(item.get('name', '') for item in condition.get('certificate', [])) or '無',
                     driver_license = ', '.join(condition.get('driverLicense', [])) or '無',
                     business_trip = job_detail.get('businessTrip') or '無',

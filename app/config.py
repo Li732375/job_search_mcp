@@ -22,3 +22,29 @@ FIELD_NAMES_ORDER = [
     '擅長要求', '證照', '駕駛執照', '出差', '104 職缺網址', 
     '公司產業類別', '法定福利'
 ]
+
+# 職缺欄位對應表
+JOB_FIELD_MAPPING = {
+    "posted_date": "更新日期",
+    "work_type": "工作型態",
+    "work_shift": "工作時段",
+    "salary_type": "薪資類型",
+    "salary_min": "最低薪資",
+    "salary_max": "最高薪資",
+    "job_name": "職缺名稱",
+    "education": "學歷",
+    "experience": "工作經驗",
+    "address_area": "工作縣市",
+    "job_area": "工作里區",
+    "address_detail": "工作地址",
+    "company_name": "公司名稱",
+    "job_description": "職缺描述",
+    "other_description": "其他描述",
+    "specialty": "擅長要求",
+    "certificate": "證照",
+    "driver_license": "駕駛執照",
+    "business_trip": "出差",
+    "job_url": "104 職缺網址",
+    "industry": "公司產業類別",
+    "legal_welfare": "法定福利",
+}

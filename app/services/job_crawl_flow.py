@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from typing import List
-from app.schemas.job import JobSchema
-from app.services.E04 import SpyE04
+from dev.app.services.spyE04 import SpyE04
 
 import time
 import json
 
 
-def crawl_E04_jobs(spider: SpyE04) -> List[JobSchema]:    
+def crawl_E04_jobs(spider: SpyE04) -> None:
+    """爬取 E04 職缺主流程"""
+    
     spider = SpyE04()
 
     # 取得篩選條件

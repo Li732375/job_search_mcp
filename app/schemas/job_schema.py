@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from typing import Optional
 from pydantic import BaseModel, Field
-from datetime import datetime
 
 
 # 定義每筆職缺資料的結構
 class JobSchema(BaseModel):
     """定義職缺資料的結構"""
-    posted_date: datetime = Field(description = "更新日期")
+    
+    posted_date: str = Field(description = "更新日期")
     work_type: str = Field(description = "工作型態")
     work_shift: str = Field(description = "工作時段")
     salary_type: str = Field(description = "薪資類型")    
@@ -16,7 +16,7 @@ class JobSchema(BaseModel):
     job_name: str = Field(description = "職缺名稱")
     education: str = Field(description = "學歷")
     experience: str = Field(description = "工作經驗")
-    addressArea: str = Field(description = "工作縣市")
+    address_area: str = Field(description = "工作縣市")
     job_area: str = Field(description = "工作里區")
     address_detail: Optional[str] = Field(default = None, description = "工作地址")
     company_name: str = Field(description = "公司名稱")
