@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Tuple, Any, Set
 from app.schemas.job_schema import JobSchema
-from config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER, JOB_FIELD_MAPPING
+from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER, JOB_FIELD_MAPPING
 
 
 import time
@@ -26,7 +26,6 @@ class SpyE04():
         self._mul_filter_params: Dict[str, str] = E04_MUL_FILTER_PARAMS
         self._field_names_order: List[str] = FIELD_NAMES_ORDER
 
-
         # 寫入空列表，清空舊紀錄
         with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
             json.dump("", f)
@@ -36,7 +35,7 @@ class SpyE04():
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
 
-        print("正在啟動隱身瀏覽器通過驗證...", end='', flush=True)
+        print("啟動隱身瀏覽器驗證...", end='', flush=True)
         with Stealth().use_sync(sync_playwright()) as p:
             browser = p.chromium.launch(headless=True)
             
@@ -206,7 +205,7 @@ class SpyE04():
                 time.sleep(random.uniform(0.1, 1))
 
     def get_job(self, job_id: str) -> Optional[JobSchema]:
-        """取得單筆職缺詳情"""
+        """依據職缺 ID 取得單筆職缺詳情"""
 
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
         headers = {'Referer': f'https://www.104.com.tw/job/{job_id}', 
