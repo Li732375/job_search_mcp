@@ -21,7 +21,7 @@ def crawl_E04_jobs(spider: SpyE04) -> None:
     print(f"共取得 {len(job_id_set)} 筆職缺")
 
     # 抓詳情並寫入 CSV (格式 2026-01-05-13-45)
-    output_file = f"job_list_{time.strftime('%Y-%m-%d-%H-%M')}.csv"
+    output_file = f"output/job_list_{time.strftime('%Y-%m-%d-%H-%M')}.csv"
     spider.fetch_jobs_and_write_csv(job_id_set, output_file)
 
     # 依是否有錯誤紀錄，調整輸出結果
@@ -32,3 +32,4 @@ def crawl_E04_jobs(spider: SpyE04) -> None:
             print(f"\n任務完成！\n資料已寫入 {output_file}\n[錯誤] 請查看 error_message.json")
         else:
             print(f"\n任務完成！\n資料已寫入 {output_file}")
+            
