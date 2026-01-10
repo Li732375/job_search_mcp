@@ -11,11 +11,12 @@ app = FastMCP("I-Want-Jobs-All")
 @app.tool()
 def crawl_e04_jobs() -> None:
     """
-    爬取 e04 全部職缺
+    依據 config.py 條件設定，爬取 e04 全部職缺
     """
     
     spider = SpyE04()
     crawl_E04_jobs(spider)
+
 
 if __name__ == "__main__":
     app.run()
