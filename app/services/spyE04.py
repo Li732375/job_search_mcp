@@ -26,9 +26,10 @@ class SpyE04():
         self._mul_filter_params: Dict[str, str] = E04_MUL_FILTER_PARAMS
         self._field_names_order: List[str] = FIELD_NAMES_ORDER
 
-        # 寫入空列表，清空舊紀錄
-        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-            json.dump("", f)
+        # 舊紀錄若存在則清空
+        if os.path.exists(self._error_log_file):
+            with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
+                json.dump([], f)
 
         self.refresh_session()
 
@@ -78,11 +79,10 @@ class SpyE04():
         # 讀取現有紀錄並更新
         data = []
         if os.path.exists(self._error_log_file):
-            try:
-                with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
-                    data = json.load(f)
-            except:
-                data = []
+            with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
+                data = json.load(f)
+        else:
+            data = []
         
         data.append(error_entry)
         with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
@@ -185,7 +185,7 @@ class SpyE04():
         return None
 
     def fetch_jobs_and_write_csv(self, 
-                                 job_ids: Set[str], 
+                                 job_id_set: Set[str], 
                                  output_file: str) -> None:
         """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
 
@@ -193,7 +193,7 @@ class SpyE04():
             writer = csv.DictWriter(f, fieldnames=FIELD_NAMES_ORDER)
             writer.writeheader()
 
-            for idx, job_id in enumerate(job_ids, 1):
+            for idx, job_id in enumerate(job_id_set, 1):
                 info = self.get_job(job_id)
                 if info:
                     raw = info.model_dump()
@@ -201,7 +201,7 @@ class SpyE04():
 
                     writer.writerow(row)
                     f.flush()
-                print(f"進度：{(idx/len(job_ids))*100:6.2f} % ({idx}/{len(job_ids)})", end='\r')
+                print(f"進度：{(idx/len(job_id_set))*100:6.2f} % ({idx}/{len(job_id_set)})", end='\r')
                 time.sleep(random.uniform(0.1, 1))
 
     def get_job(self, job_id: str) -> Optional[JobSchema]:
