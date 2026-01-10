@@ -38,13 +38,13 @@ pip install -r requirements.txt
 ```
 .
 │  .gitignore
+│  agent_tools.py               # MCP 介面、伺服器
 │  main.py 
 │  README.md
 │  requirements.txt             # 依賴套件
 │
-└─app
-    │  agent_tools.py           # MCP 介面、伺服器
-    │  config.py                # 條件、欄位順序
+└─app 
+    │ config.py                 # 條件、欄位順序
     │
     ├─extractors
     ├─schemas
