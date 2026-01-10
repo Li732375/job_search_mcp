@@ -22,7 +22,7 @@ def crawl_E04_jobs(spider: SpyE04) -> None:
 
     # 抓詳情並寫入 CSV (格式 2026-01-05-13-45)
     output_file = f"job_list_{time.strftime('%Y-%m-%d-%H-%M')}.csv"
-    spider.fetch_jobs_and_write_csv(job_ids, output_file)
+    spider.fetch_jobs_and_write_csv(job_id_set, output_file)
 
     # 依是否有錯誤紀錄，調整輸出結果
     if os.path.exists('error_message.json'):
