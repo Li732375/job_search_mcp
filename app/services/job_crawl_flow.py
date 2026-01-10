@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .spyE04 import SpyE04
+from spyE04 import SpyE04
 
 import time
 import json
