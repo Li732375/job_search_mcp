@@ -29,3 +29,10 @@ class Job_Schema(BaseModel):
     job_url: str = Field(description = "104 職缺網址")
     industry: str = Field(description = "公司產業類別")
     legal_welfare: Optional[str] = Field(default = None, description = "法定福利")
+
+# 定義黑名單公司資料結構
+class Blacklist_Schema(BaseModel):
+    """定義黑名單公司資料的結構"""
+    
+    company_name: str = Field(description = "公司名稱")
+    reason: Optional[str] = Field(default = None, description = "加入黑名單原因")
