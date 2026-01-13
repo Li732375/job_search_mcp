@@ -10,7 +10,6 @@ class JobDB:
     def __init__(self, db_url: str = JOB_DATA_LOCAL_URL) -> None:
         """初始化職缺資料庫連線"""
         
-        # 建立資料庫連線（若不存在則建立）
         self.db_url = db_url
         self.conn: Optional[sqlite3.Connection] = None
         self._it_cursor = None  # 記錄走訪指針
@@ -18,8 +17,8 @@ class JobDB:
     def __enter__(self) -> "JobDB":
         """進入 with 區塊時自動執行，並回傳一個資料庫連線物件"""
 
-        self.conn = sqlite3.connect(self.db_path)
-
+        # 建立資料庫連線（若不存在則建立）
+        self.conn = sqlite3.connect(self.db_url)
         return self
 
     def __exit__(self, 
@@ -47,11 +46,10 @@ class JobDB:
                 self.conn.commit()
             
             self.conn.close()
-
             return False
             
     def add_table(self, table_name: str, data_schema: type) -> None:
-        """建立職缺資料表"""
+        """新增資料表"""
         
         # 取得 data_schema 欄位定義
         cols = []
@@ -80,7 +78,7 @@ class JobDB:
         print(f"成功建立資料表 {table_name} ！")
 
     def is_table_exists(self, table_name: str) -> bool:
-        """檢查資料表是否存在"""
+        """檢查資料表存在"""
 
         # 取得游標
         cursor = self.conn.cursor()
@@ -113,7 +111,8 @@ class JobDB:
                            (str(uuid.uuid4()), *[getattr(data_schema, name) for name in field_names])
                            )
         else:
-            raise ValueError(f"資料表 {table_name} 不存在於 {self.db_url} ！")
+            print(f"資料表 {table_name} 不存在於 {self.db_url} ！")
+            return None
     
     def walk(self, table_name: str, id_start: str = None) -> Any:
         """
