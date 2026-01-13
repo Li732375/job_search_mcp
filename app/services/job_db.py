@@ -117,7 +117,7 @@ class JobDB:
     
     def walk(self, table_name: str, id_start: str = None) -> Any:
         """
-        指定 ID 開頭模糊篩選的逐筆走訪
+        指定 ID 開頭*模糊篩選)的逐筆走訪
 
         1. 若無 id_start：進入走訪模式，每次執行回傳下一筆完整資料。
         2. 若有 id_start：
@@ -127,25 +127,24 @@ class JobDB:
         """
         cursor = self.conn.cursor()
         
-        # 取得 ID 欄位名稱
         cursor.execute(f"SELECT * FROM {table_name} LIMIT 0")
         id_col = cursor.description[0][0]
 
         if not id_start:
-            # 如果是第一次走訪，建立持久的 cursor
             if self._it_cursor is None:
                 self._it_cursor = self.conn.cursor()
                 self._it_cursor.execute(f"SELECT * FROM {table_name} ORDER BY {id_col} ASC")
             
-            row = self._it_cursor.fetchone()
+            row = self._it_cursor.fetchone()  # 取得指標下一筆資料
             
             if row is None:
-                self._it_cursor = None # 走訪結束，重設狀態
+                self._it_cursor = None  # 走訪結束，重設狀態
                 print("已達表尾，無更多資料。")
                 return None
-            return row
+            
+            return row  # tuple
 
-        # 每次指定 ID 都會重設走訪指針
+        # 每次指定 ID 都會重設走訪指標
         self._it_cursor = None 
 
         # 先計算符合數
@@ -154,11 +153,11 @@ class JobDB:
         total_count = cursor.fetchone()[0]
 
         if total_count == 0:
-            print(f"找不到符合 '{id_start}' 的資料。")
+            print(f"找不到符合的資料。")
             return None
 
         if total_count > 5:
-            print(f"符合數 ({total_count}) 大於五筆，請提供更多 ID 資訊。")
+            print(f"資料表 ({total_count}) 中符合數大於五筆，請提供更多 ID 資訊。")
             return None
         
         """
@@ -177,7 +176,7 @@ class JobDB:
         results = cursor.fetchall()
 
         if total_count == 1:
-            return results[0]
+            return results[0]  # 回傳完整資料，tuple
         else:
             output = tuple(
                 (idx, str(row[0])[:6], row) 
@@ -185,5 +184,5 @@ class JobDB:
             )
             print(f"多項相符資料，請提供更多 ID 資訊。")
             
-            return output # 回傳少量相符清單
+            return output  # 回傳少量相符清單，數筆 tuple 集合的 list
     
