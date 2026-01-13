@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 
 
 # 定義每筆職缺資料的結構
-class JobSchema(BaseModel):
+class Job_Schema(BaseModel):
     """定義職缺資料的結構"""
     
     posted_date: str = Field(description = "更新日期")
