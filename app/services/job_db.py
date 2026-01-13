@@ -49,7 +49,12 @@ class JobDB:
             return False
             
     def add_table(self, table_name: str, data_schema: type) -> None:
-        """新增資料表"""
+        """
+        新增資料表
+
+        資料表最左欄固定是 data_id (TEXT PRIMARY KEY)
+        往右其他欄位依 data_schema 定義自動產生
+        """
         
         # 取得 data_schema 欄位定義
         cols = []
