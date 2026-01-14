@@ -1,4 +1,4 @@
-fastmcp==2.14.2
+fastmcp==2.14.3
 playwright==1.57.0
 playwright_stealth==2.0.0
 pydantic==2.12.5
