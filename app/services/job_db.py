@@ -82,7 +82,7 @@ class JobDB:
                         )
                         """)
         
-        print(f"成功建立資料表 {table_name} ！")
+        print(f"成功建立資料表 {table_name}", end='\r' )
 
     def is_table_exists(self, table_name: str) -> bool:
         """檢查資料表存在"""
@@ -118,7 +118,7 @@ class JobDB:
                            (str(uuid.uuid4()), *[getattr(data_schema, name) for name in field_names])
                            )
         else:
-            print(f"資料表 {table_name} 不存在於 {self.db_url} ！")
+            print(f"[錯誤]資料表 {table_name} 不存在於 {self.db_url}", end='\r')
             return None
     
     def walk(self, table_name: str, id_start: str = None) -> Any:
