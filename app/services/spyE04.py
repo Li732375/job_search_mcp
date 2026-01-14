@@ -26,10 +26,12 @@ class SpyE04():
 
         self.refresh_session()
 
+        self.jobs_table_name = 'jobs_' + time.strftime("%Y%m%d_%H%M%S")
+
         # 檢核資料庫存在與連線狀態
-        with JobDB(_JOB_DATA_LOCAL_URL) as job_db:
-            if not job_db.is_table_exists(_JOB_DATA_TABLE):
-                job_db.add_table(_JOB_DATA_TABLE, Job_Schema)
+        with JobDB(_JOB_DB_LOCAL_URL) as job_db:
+            '''表名稱不可數字開頭、不區分大小寫，強烈建議統一使用小寫。'''
+            job_db.create_table(self.jobs_table_name, Job_Schema)
 
             if not job_db.is_table_exists(_BLACKLIST_TABLE):
                 job_db.add_table(_BLACKLIST_TABLE, Blacklist_Schema)
@@ -192,7 +194,8 @@ class SpyE04():
                     
                     if info:
                         # 寫入資料庫，此處 info 是 Job_Schema 實例
-                        db.insert(table_name=_JOB_DATA_TABLE, data_schema=info)
+                        db.insert(table_name=self.jobs_table_name, 
+                                  data_schema=info)
                     
                     # 顯示進度
                     progress = (idx / total) * 100
