@@ -16,5 +16,12 @@ E04_MUL_FILTER_PARAMS = {
 
 ### 以下變數不建議改動
 
-# 職缺資料庫路徑
-JOB_DATA_LOCAL_URL = 'app/database/job_data.db'
+# 預設資料庫路徑
+_JOB_DATA_LOCAL_URL = 'app/database/job_data.db'
+
+# 預設資料表名稱
+_JOB_DATA_TABLE = 'jobs' 
+_BLACKLIST_TABLE = 'blacklist'
+
+# 預設錯誤訊息紀錄檔案
+_ERROR_LOG_URL = 'error_message.json'

@@ -1,5 +1,3 @@
-from app.config import JOB_DATA_LOCAL_URL
-
 import uuid
 import sqlite3
 from types import TracebackType
@@ -7,7 +5,7 @@ from typing import Optional, Type, Any
 
 
 class JobDB:
-    def __init__(self, db_url: str = JOB_DATA_LOCAL_URL) -> None:
+    def __init__(self, db_url: str = _JOB_DATA_LOCAL_URL) -> None:
         """初始化職缺資料庫連線"""
         
         self.db_url = db_url
