@@ -3,12 +3,12 @@ import sqlite3
 from types import TracebackType
 from typing import Optional, Type, Any
 
-from app.config import _JOB_DATA_LOCAL_URL
+from app.config import _JOB_DB_LOCAL_URL
 from app.services.log import log_error
 
 
 class JobDB:
-    def __init__(self, db_url: str = _JOB_DATA_LOCAL_URL) -> None:
+    def __init__(self, db_url: str = _JOB_DB_LOCAL_URL) -> None:
         """初始化職缺資料庫連線"""
         
         self.db_url = db_url
@@ -50,7 +50,7 @@ class JobDB:
             self.conn.close()
             return False
             
-    def add_table(self, table_name: str, data_schema: type) -> None:
+    def create_table(self, table_name: str, data_schema: type) -> None:
         """
         新增資料表
 
@@ -82,7 +82,7 @@ class JobDB:
                         )
                         """)
         
-        print(f"成功建立資料表 {table_name} ！")
+        print(f"成功建立資料表 {table_name}", end='\r' )
 
     def is_table_exists(self, table_name: str) -> bool:
         """檢查資料表存在"""
@@ -118,7 +118,7 @@ class JobDB:
                            (str(uuid.uuid4()), *[getattr(data_schema, name) for name in field_names])
                            )
         else:
-            print(f"資料表 {table_name} 不存在於 {self.db_url} ！")
+            print(f"[錯誤]資料表 {table_name} 不存在於 {self.db_url}", end='\r')
             return None
     
     def walk(self, table_name: str, id_start: str = None) -> Any:

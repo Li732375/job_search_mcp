@@ -9,7 +9,7 @@ from playwright_stealth import Stealth
 
 from app.schemas.job_schema import Job_Schema, Blacklist_Schema
 from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, \
-    _JOB_DATA_LOCAL_URL, _JOB_DATA_TABLE, _BLACKLIST_TABLE
+    _JOB_DB_LOCAL_URL, _BLACKLIST_TABLE
 from app.services.job_db import JobDB
 from app.services.log import log_error
 
@@ -26,13 +26,15 @@ class SpyE04():
 
         self.refresh_session()
 
+        self.jobs_table_name = 'jobs_' + time.strftime("%Y%m%d_%H%M%S")
+
         # 檢核資料庫存在與連線狀態
-        with JobDB(_JOB_DATA_LOCAL_URL) as job_db:
-            if not job_db.is_table_exists(_JOB_DATA_TABLE):
-                job_db.add_table(_JOB_DATA_TABLE, Job_Schema)
+        with JobDB(_JOB_DB_LOCAL_URL) as job_db:
+            '''表名稱不可數字開頭、不區分大小寫，強烈建議統一使用小寫。'''
+            job_db.create_table(self.jobs_table_name, Job_Schema)
 
             if not job_db.is_table_exists(_BLACKLIST_TABLE):
-                job_db.add_table(_BLACKLIST_TABLE, Blacklist_Schema)
+                job_db.create_table(_BLACKLIST_TABLE, Blacklist_Schema)
 
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
@@ -182,7 +184,7 @@ class SpyE04():
         """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 SQLite 檔案"""
         total = len(job_id_set)
         
-        with JobDB(_JOB_DATA_LOCAL_URL) as db:
+        with JobDB(_JOB_DB_LOCAL_URL) as db:
             print(f"開始抓取詳情並寫入資料庫...")
 
             for idx, job_id in enumerate(job_id_set, 1):
@@ -192,7 +194,8 @@ class SpyE04():
                     
                     if info:
                         # 寫入資料庫，此處 info 是 Job_Schema 實例
-                        db.insert(table_name=_JOB_DATA_TABLE, data_schema=info)
+                        db.insert(table_name=self.jobs_table_name, 
+                                  data_schema=info)
                     
                     # 顯示進度
                     progress = (idx / total) * 100
