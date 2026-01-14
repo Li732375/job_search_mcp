@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from app.services.spyE04 import SpyE04
-
-import time
-import json
-import os
+from app.services.log import is_log_exists
 
 
 def crawl_E04_jobs(spider: SpyE04) -> None:
@@ -25,11 +22,8 @@ def crawl_E04_jobs(spider: SpyE04) -> None:
     spider.fetch_jobs_and_write_csv(job_id_set, output_file)
 
     # 依是否有錯誤紀錄，調整輸出結果
-    if os.path.exists('error_message.json'):
-        with open('error_message.json', 'r', encoding='utf-8-sig') as f:
-            errors = json.load(f)
-        if len(errors) > 0:
-            print(f"\n任務完成！\n資料已寫入 {output_file}\n[錯誤] 請查看 error_message.json")
-        else:
-            print(f"\n任務完成！\n資料已寫入 {output_file}")
-            
+    if is_log_exists():
+        print(f"\n任務完成！\n[錯誤] 請查看錯誤紀錄檔案以了解詳情。")
+    else:
+        print(f"\n任務完成！")
+        

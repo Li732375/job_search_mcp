@@ -20,16 +20,9 @@ class SpyE04():
 
         self._session = requests.Session()
         self._headers_user_agent: str = ""
-        self._error_log_file: str = 'error_message.json'
 
         self._uni_filter_params: Dict[str, str] = E04_UNI_FILTER_PARAMS
         self._mul_filter_params: Dict[str, str] = E04_MUL_FILTER_PARAMS
-        self._field_names_order: List[str] = FIELD_NAMES_ORDER
-
-        # 舊紀錄若存在則清空
-        if os.path.exists(self._error_log_file):
-            with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-                json.dump([], f)
 
         self.refresh_session()
 
@@ -67,26 +60,16 @@ class SpyE04():
                   job_id: str, 
                   message: Any, 
                   raw_data: Optional[Any]=None) -> None:
-        """將錯誤訊息與原始資料存入 JSON 檔案"""
+        """錯誤紀錄"""
 
+        # 自定義錯誤紀錄欄位格式
         error_entry = {
-            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
             'job_id': job_id,
             'error_message': str(message),
             'raw_data': raw_data
         }
         
-        # 讀取現有紀錄並更新
-        data = []
-        if os.path.exists(self._error_log_file):
-            with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
-                data = json.load(f)
-        else:
-            data = []
-        
-        data.append(error_entry)
-        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        log_error(**error_entry)
 
     def generate_filter_combinations(self, 
                                      ) -> Tuple[List[str], List[Tuple[str, ...]]]:
@@ -95,6 +78,7 @@ class SpyE04():
         keys: List[str] = list(self._mul_filter_params.keys())
         values: List[List[str]] = [v.split(',') for v in self._mul_filter_params.values()]
         combinations: List[Tuple[str, ...]] = list(product(*values))
+
         return keys, combinations
    
     def collect_job_ids(self,  
@@ -269,5 +253,6 @@ class SpyE04():
         
         except Exception as e:
             self.log_error(job_id, e, raw_data=job_data)
+
             return None
     

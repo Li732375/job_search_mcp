@@ -3,6 +3,9 @@ import sqlite3
 from types import TracebackType
 from typing import Optional, Type, Any
 
+from app.config import _JOB_DATA_LOCAL_URL
+from app.services.log import log_error
+
 
 class JobDB:
     def __init__(self, db_url: str = _JOB_DATA_LOCAL_URL) -> None:
@@ -36,7 +39,8 @@ class JobDB:
         if self.conn:
             # 離開時若有錯誤發生
             if exc_type:
-                print(f"執行 SQL 階段錯誤: {exc_val}")
+                self.log_error("__EXIT__", f"執行 SQL 階段錯誤:{exc_type}\n{exc_val}\n{exc_tb}")
+                print(f"執行 SQL 階段錯誤")
 
                 # 復原到修改前
                 self.conn.rollback()
@@ -188,3 +192,10 @@ class JobDB:
             
             return output  # 回傳少量相符清單，數筆 tuple 集合的 list
     
+    def log_error(self, fun_name: str, message: Any) -> None:
+        """錯誤紀錄"""
+
+        log_error(
+            function = fun_name,
+            message = message,
+        )
