@@ -26,6 +26,14 @@ class SpyE04():
 
         self.refresh_session()
 
+        # 檢核資料庫存在與連線狀態
+        with JobDB(_JOB_DATA_LOCAL_URL) as job_db:
+            if not job_db.is_table_exists(_JOB_DATA_TABLE):
+                job_db.add_table(_JOB_DATA_TABLE, Job_Schema)
+
+            if not job_db.is_table_exists(_BLACKLIST_TABLE):
+                job_db.add_table(_BLACKLIST_TABLE, Blacklist_Schema)
+
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
 
@@ -166,29 +174,38 @@ class SpyE04():
             except Exception as e:
                 attempt += 1
                 time.sleep(2)
+
         return None
 
-    def fetch_jobs_and_write_csv(self, 
-                                 job_id_set: Set[str], 
-                                 output_file: str) -> None:
-        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
-
-        with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=FIELD_NAMES_ORDER)
-            writer.writeheader()
+    def fetch_jobs_and_write_sqlite(self, 
+                                    job_id_set: Set[str]) -> None:
+        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 SQLite 檔案"""
+        total = len(job_id_set)
+        
+        with JobDB(_JOB_DATA_LOCAL_URL) as db:
+            print(f"開始抓取詳情並寫入資料庫...")
 
             for idx, job_id in enumerate(job_id_set, 1):
-                info = self.get_job(job_id)
-                if info:
-                    raw = info.model_dump()
-                    row = {col: raw.get(JOB_FIELD_MAPPING[col]) for col in FIELD_NAMES_ORDER}
+                try:
+                    # 抓取職缺詳細資訊 (回傳 Job_Schema 物件)
+                    info = self.get_job(job_id)
+                    
+                    if info:
+                        # 寫入資料庫，此處 info 是 Job_Schema 實例
+                        db.insert(table_name=_JOB_DATA_TABLE, data_schema=info)
+                    
+                    # 顯示進度
+                    progress = (idx / total) * 100
+                    print(f"進度：{progress:6.2f} % ({idx}/{total}) | 目前 ID: {job_id}", end='\r')
+                    
+                    # 隨機延遲，避免過快被鎖
+                    time.sleep(random.uniform(0.3, 1.2))
 
-                    writer.writerow(row)
-                    f.flush()
-                print(f"進度：{(idx/len(job_id_set))*100:6.2f} % ({idx}/{len(job_id_set)})", end='\r')
-                time.sleep(random.uniform(0.1, 1))
+                except Exception as e:
+                    self.log_error(job_id, f"寫入資料庫發生錯誤: {e}")
+                    continue
 
-    def get_job(self, job_id: str) -> Optional[JobSchema]:
+    def get_job(self, job_id: str) -> Optional[Job_Schema]:
         """依據職缺 ID 取得單筆職缺詳情"""
 
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
