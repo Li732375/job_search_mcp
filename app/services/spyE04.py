@@ -196,7 +196,7 @@ class SpyE04():
                     
                     # 顯示進度
                     progress = (idx / total) * 100
-                    print(f"進度：{progress:6.2f} % ({idx}/{total}) | 目前 ID: {job_id}", end='\r')
+                    print(f"進度：{progress:6.2f} % ({idx}/{total})", end='\r')
                     
                     # 隨機延遲，避免過快被鎖
                     time.sleep(random.uniform(0.3, 1.2))
