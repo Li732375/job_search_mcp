@@ -3,7 +3,6 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-# 定義每筆職缺資料的結構
 class Job_Schema(BaseModel):
     """定義職缺資料的結構"""
     
@@ -30,7 +29,6 @@ class Job_Schema(BaseModel):
     industry: str = Field(description = "公司產業類別")
     legal_welfare: Optional[str] = Field(default = None, description = "法定福利")
 
-# 定義黑名單公司資料結構
 class Blacklist_Schema(BaseModel):
     """定義黑名單公司資料的結構"""
     

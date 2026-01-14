@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+from fastmcp import FastMCP
+
 from app.services.spyE04 import SpyE04
 from app.services.job_crawl_flow import crawl_E04_jobs
 from app.services.log import clear_error_log

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from app.services.spyE04 import SpyE04
 from app.services.log import is_log_exists
 

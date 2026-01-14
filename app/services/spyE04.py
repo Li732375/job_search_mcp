@@ -1,17 +1,17 @@
 from typing import Dict, List, Optional, Tuple, Any, Set
-from app.schemas.job_schema import JobSchema
-from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER, JOB_FIELD_MAPPING
-
-
 import time
 import random
 import requests
 from itertools import product
-import csv
-import json
-import os
+
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
+
+from app.schemas.job_schema import Job_Schema, Blacklist_Schema
+from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, \
+    _JOB_DATA_LOCAL_URL, _JOB_DATA_TABLE, _BLACKLIST_TABLE
+from app.services.job_db import JobDB
+from app.services.log import log_error
 
 
 class SpyE04():
@@ -224,7 +224,7 @@ class SpyE04():
             work_shift = ' '.join(workPeriod.get('shifts', {}).keys())
             duty_time = workPeriod.get('note', '')
             
-            data_info = JobSchema(
+            data_info = Job_Schema(
                     posted_date = header.get('appearDate'), 
                     work_type = workType,
                     work_shift = f"{work_shift} {duty_time}".strip() or '無',
