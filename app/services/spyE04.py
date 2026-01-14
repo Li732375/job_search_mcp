@@ -1,17 +1,17 @@
 from typing import Dict, List, Optional, Tuple, Any, Set
-from app.schemas.job_schema import JobSchema
-from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, FIELD_NAMES_ORDER, JOB_FIELD_MAPPING
-
-
 import time
 import random
 import requests
 from itertools import product
-import csv
-import json
-import os
+
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
+
+from app.schemas.job_schema import Job_Schema, Blacklist_Schema
+from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, \
+    _JOB_DATA_LOCAL_URL, _JOB_DATA_TABLE, _BLACKLIST_TABLE
+from app.services.job_db import JobDB
+from app.services.log import log_error
 
 
 class SpyE04():
@@ -20,18 +20,19 @@ class SpyE04():
 
         self._session = requests.Session()
         self._headers_user_agent: str = ""
-        self._error_log_file: str = 'error_message.json'
 
         self._uni_filter_params: Dict[str, str] = E04_UNI_FILTER_PARAMS
         self._mul_filter_params: Dict[str, str] = E04_MUL_FILTER_PARAMS
-        self._field_names_order: List[str] = FIELD_NAMES_ORDER
-
-        # 舊紀錄若存在則清空
-        if os.path.exists(self._error_log_file):
-            with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-                json.dump([], f)
 
         self.refresh_session()
+
+        # 檢核資料庫存在與連線狀態
+        with JobDB(_JOB_DATA_LOCAL_URL) as job_db:
+            if not job_db.is_table_exists(_JOB_DATA_TABLE):
+                job_db.add_table(_JOB_DATA_TABLE, Job_Schema)
+
+            if not job_db.is_table_exists(_BLACKLIST_TABLE):
+                job_db.add_table(_BLACKLIST_TABLE, Blacklist_Schema)
 
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""
@@ -67,26 +68,16 @@ class SpyE04():
                   job_id: str, 
                   message: Any, 
                   raw_data: Optional[Any]=None) -> None:
-        """將錯誤訊息與原始資料存入 JSON 檔案"""
+        """錯誤紀錄"""
 
+        # 自定義錯誤紀錄欄位格式
         error_entry = {
-            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S"),
             'job_id': job_id,
             'error_message': str(message),
             'raw_data': raw_data
         }
         
-        # 讀取現有紀錄並更新
-        data = []
-        if os.path.exists(self._error_log_file):
-            with open(self._error_log_file, 'r', encoding='utf-8-sig') as f:
-                data = json.load(f)
-        else:
-            data = []
-        
-        data.append(error_entry)
-        with open(self._error_log_file, 'w', encoding='utf-8-sig') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        log_error(**error_entry)
 
     def generate_filter_combinations(self, 
                                      ) -> Tuple[List[str], List[Tuple[str, ...]]]:
@@ -95,6 +86,7 @@ class SpyE04():
         keys: List[str] = list(self._mul_filter_params.keys())
         values: List[List[str]] = [v.split(',') for v in self._mul_filter_params.values()]
         combinations: List[Tuple[str, ...]] = list(product(*values))
+
         return keys, combinations
    
     def collect_job_ids(self,  
@@ -182,29 +174,38 @@ class SpyE04():
             except Exception as e:
                 attempt += 1
                 time.sleep(2)
+
         return None
 
-    def fetch_jobs_and_write_csv(self, 
-                                 job_id_set: Set[str], 
-                                 output_file: str) -> None:
-        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 CSV 檔案"""
-
-        with open(output_file, 'w', encoding='utf-8-sig', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=FIELD_NAMES_ORDER)
-            writer.writeheader()
+    def fetch_jobs_and_write_sqlite(self, 
+                                    job_id_set: Set[str]) -> None:
+        """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 SQLite 檔案"""
+        total = len(job_id_set)
+        
+        with JobDB(_JOB_DATA_LOCAL_URL) as db:
+            print(f"開始抓取詳情並寫入資料庫...")
 
             for idx, job_id in enumerate(job_id_set, 1):
-                info = self.get_job(job_id)
-                if info:
-                    raw = info.model_dump()
-                    row = {col: raw.get(JOB_FIELD_MAPPING[col]) for col in FIELD_NAMES_ORDER}
+                try:
+                    # 抓取職缺詳細資訊 (回傳 Job_Schema 物件)
+                    info = self.get_job(job_id)
+                    
+                    if info:
+                        # 寫入資料庫，此處 info 是 Job_Schema 實例
+                        db.insert(table_name=_JOB_DATA_TABLE, data_schema=info)
+                    
+                    # 顯示進度
+                    progress = (idx / total) * 100
+                    print(f"進度：{progress:6.2f} % ({idx}/{total})", end='\r')
+                    
+                    # 隨機延遲，避免過快被鎖
+                    time.sleep(random.uniform(0.3, 1.2))
 
-                    writer.writerow(row)
-                    f.flush()
-                print(f"進度：{(idx/len(job_id_set))*100:6.2f} % ({idx}/{len(job_id_set)})", end='\r')
-                time.sleep(random.uniform(0.1, 1))
+                except Exception as e:
+                    self.log_error(job_id, f"寫入資料庫發生錯誤: {e}")
+                    continue
 
-    def get_job(self, job_id: str) -> Optional[JobSchema]:
+    def get_job(self, job_id: str) -> Optional[Job_Schema]:
         """依據職缺 ID 取得單筆職缺詳情"""
 
         url = f'https://www.104.com.tw/job/ajax/content/{job_id}'
@@ -240,7 +241,7 @@ class SpyE04():
             work_shift = ' '.join(workPeriod.get('shifts', {}).keys())
             duty_time = workPeriod.get('note', '')
             
-            data_info = JobSchema(
+            data_info = Job_Schema(
                     posted_date = header.get('appearDate'), 
                     work_type = workType,
                     work_shift = f"{work_shift} {duty_time}".strip() or '無',
@@ -269,5 +270,6 @@ class SpyE04():
         
         except Exception as e:
             self.log_error(job_id, e, raw_data=job_data)
+
             return None
     
