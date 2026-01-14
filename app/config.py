@@ -17,7 +17,7 @@ E04_MUL_FILTER_PARAMS = {
 ### 以下變數不建議改動
 
 # 預設資料庫路徑
-_JOB_DATA_LOCAL_URL = 'app/database/job_data.db'
+_JOB_DB_LOCAL_URL = 'app/database/job_data.db'
 
 # 預設資料表名稱
 _JOB_DATA_TABLE = 'jobs' 

@@ -9,7 +9,7 @@ from playwright_stealth import Stealth
 
 from app.schemas.job_schema import Job_Schema, Blacklist_Schema
 from app.config import E04_UNI_FILTER_PARAMS, E04_MUL_FILTER_PARAMS, \
-    _JOB_DATA_LOCAL_URL, _JOB_DATA_TABLE, _BLACKLIST_TABLE
+    _JOB_DB_LOCAL_URL, _BLACKLIST_TABLE
 from app.services.job_db import JobDB
 from app.services.log import log_error
 
@@ -182,7 +182,7 @@ class SpyE04():
         """依據蒐集到的職缺 ID 逐一抓取職缺詳情，並寫入 SQLite 檔案"""
         total = len(job_id_set)
         
-        with JobDB(_JOB_DATA_LOCAL_URL) as db:
+        with JobDB(_JOB_DB_LOCAL_URL) as db:
             print(f"開始抓取詳情並寫入資料庫...")
 
             for idx, job_id in enumerate(job_id_set, 1):

@@ -3,12 +3,12 @@ import sqlite3
 from types import TracebackType
 from typing import Optional, Type, Any
 
-from app.config import _JOB_DATA_LOCAL_URL
+from app.config import _JOB_DB_LOCAL_URL
 from app.services.log import log_error
 
 
 class JobDB:
-    def __init__(self, db_url: str = _JOB_DATA_LOCAL_URL) -> None:
+    def __init__(self, db_url: str = _JOB_DB_LOCAL_URL) -> None:
         """初始化職缺資料庫連線"""
         
         self.db_url = db_url
