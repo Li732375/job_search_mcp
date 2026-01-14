@@ -34,7 +34,7 @@ class SpyE04():
             job_db.create_table(self.jobs_table_name, Job_Schema)
 
             if not job_db.is_table_exists(_BLACKLIST_TABLE):
-                job_db.add_table(_BLACKLIST_TABLE, Blacklist_Schema)
+                job_db.create_table(_BLACKLIST_TABLE, Blacklist_Schema)
 
     def refresh_session(self) -> None:
         """使用 Playwright 啟動隱身瀏覽器，取得最新 cookie 與 User-Agent"""

@@ -50,7 +50,7 @@ class JobDB:
             self.conn.close()
             return False
             
-    def add_table(self, table_name: str, data_schema: type) -> None:
+    def create_table(self, table_name: str, data_schema: type) -> None:
         """
         新增資料表
 
